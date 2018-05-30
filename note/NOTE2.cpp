@@ -491,3 +491,54 @@ const int max_files = 20;   //max_files 是常量表达式
 const int limit = max_files + 1; //limit 是常量表达式
 int staff_size = 27; //staff_size 不是常量表达式
 const int sz = get_size(); //sz 不是常量表达式
+NOTE 尽管staff_size 的初始值是个字面值常量，但其数据类型是 int 故不是常量表达式
+NOTE 尽管 sz 本身是常量，但其具体值直到运行时才能得到，也不是常量表达式
+
+constexpr 变量
+C++11 标准规定 允许将变量声明为 constexpr 类型以便由编译器来验证变量的值
+是否是一个常量表达式
+声明为 constexpr 的变量一定是一个常量，而且必须用常量表达式初始化
+constexpr int mf = 20; //20 是常量表达式
+constexpr int limit = mf + 1; //mf + 1 是常量表达式
+constexpr int sz = size(); // 只有当 size 是一个 constexpr 函数时才正确
+NOTE 一般，如果认为一个变量是常量表达式，就用 constexpr 来声明
+
+字面值类型
+NOTE 函数体内定义的变量一般并非存放在固定地址中， constexpr 指针不能指向这样的变量
+NOTE 定义于所以函数体之外的对象其地址固定不变，能用来初始化 constexpr 指针
+指针和 constexpr
+在 constexpr 声明中如果定义了一个指针，限定符 constexpr 仅对指针有效，与指针所指对象无关
+const int *p = nullptr;  //p 是一个指向整型常量的指针
+constexpr int *q = nullptr; //q 是一个指向整数的常量指针
+与其他常量指针类似，constexpr 指针既可以指向常量也可以指向一个非常量
+constexpr int *np = nullptr;
+int j = 0;
+constexpr int i = 42;  // i 的类型是整型常量
+//i j 必须定义在函数体之外
+constexpr const int *p = &i; // p 是常量指针，指向整型常量 i
+constexpr int *p1 = &j; //p1 是常量指针，指向整数 j
+
+2.5 处理类型
+2.5.1 类型别名
+类型别名是一个名字，有两种定义方法
+1 使用关键字 typedef
+typedef double wages; //wages 是 double 的同义词
+typedef wages base, *p; //base 是 double 的同义词，p 是 double * 的同义词
+2 使用 别名声明
+using SI = Sales_item; // SI 是 Sales_item 的同义词
+这种使用关键字 using 作为别名声明的开始，其后紧跟别名和等号，作用是把等号左侧的名字规定成等号右侧类型的别名
+类型别名和类型的名字等价，只要是类型的名字能出现的地方，就能使用类型别名
+wages, hourly, weekly;//等价于 double ，hourly ， weekly
+SI item; //等价于 Sales_item item
+
+指针，常量和类型别名
+typedef char *pstring; 
+const pstring cstr = 0; //cstr 是指向 char 的常量指针
+const pstring *ps; //ps 是指针，对象是指向 char 的常量指针
+特别提示
+const char *cstr = 0; //并不等同于 const pstring cstr = 0;
+前一个基本数据类型是 const char ,* 是声明符的一部分即声明的是指向 const char 的指针
+后一个基本数据类型是 const char *，声明的是指向 char 的常量指针
+
+auto 类型说明符
+
