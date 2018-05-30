@@ -537,8 +537,15 @@ const pstring cstr = 0; //cstr 是指向 char 的常量指针
 const pstring *ps; //ps 是指针，对象是指向 char 的常量指针
 特别提示
 const char *cstr = 0; //并不等同于 const pstring cstr = 0;
-前一个基本数据类型是 const char ,* 是声明符的一部分即声明的是指向 const char 的指针
+前一个基本数据类型是 const char, *是声明符的一部分即声明的是指向 const char 的指针
 后一个基本数据类型是 const char *，声明的是指向 char 的常量指针
 
 auto 类型说明符
+auto 让编译器通过初始值来推算变量的类型。那么，auto 定义的变量必须有初始值
+//由 vall 和 val2 相加的结果可以推断出 item 的类型
+auto item = vall + val2; // item 初始化为 vall 和 val2 相加的结果
+使用 auto 也能在一条语句中声明多个变量，但是这样变量的初始基本类型必须一样
+auto i = 0, *p = &i; //正确：i 是整数，p 是整型指针
+auto sz = 0, pi = 3.14; //错误：sz 和 pi 的类型不一致
 
+复合类型，常量和 auto
