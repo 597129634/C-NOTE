@@ -510,7 +510,7 @@ NOTE 定义于所以函数体之外的对象其地址固定不变，能用来初
 在 constexpr 声明中如果定义了一个指针，限定符 constexpr 仅对指针有效，与指针所指对象无关
 const int *p = nullptr;  //p 是一个指向整型常量的指针
 constexpr int *q = nullptr; //q 是一个指向整数的常量指针
-与其他常量指针类似，constexpr 指针既可以指向常量也可以指向一个非常量
+与其他常量指针类似, constexpr 指针既可以指向常量也可以指向一个非常量
 constexpr int *np = nullptr;
 int j = 0;
 constexpr int i = 42;  // i 的类型是整型常量
