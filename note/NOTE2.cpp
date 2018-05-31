@@ -596,6 +596,76 @@ decltype(cj) y = x; //y 的类型是 const int &，y 绑定到变量 x 上
 decltype(cj) z; //错误 ：z 是一个引用，必须初始化
 
 decltype 和引用
+如果 decltype 使用的表达式不是一个变量，则 decltype 返回表达式结果对应的类型
+有些表达式向 decltype 会返回一个引用类型
+一般这种意味着该表达式的结果对象能作为一条赋制语句的左值
+//decltype 的结果可以是引用类型
+int i = 42, *p = &i, &r = i;
+decltype(r + 0)b;   //正确:加法的结果是 int ，因此 b 是一个（未初始化的）int 
+decltype(*p)c; //错误:c 是 int &，必须初始化
+因为 r 是一个引用，因此 decltype(r) 的结果是引用类型，如果想让结果类型是 r 所指的类型
+如果想让结果类型是 r 所指的类型，可以把 r 作为表达式的一部分，如 r + 0，显然这个表达式
+的结果将是一个具体值而非一个引用
+另一方面，如果表达式的内容是解引用操作，则decltype将得到引用类型
+解引用指针可以得到指针所指对象，还能给这个对象赋值
+因此 decltype(*p) 的结果类型就是 int &，而非 int
 
+decltype 和 auto 的另一处重要区别是，decltype 的结果类型与表达式形式密切相关
+有一种情况需要特别注意：
+对于decltype所用表达式，如果变量名加上了一对括号，则得到的类型与不加括号时会有不同
+如果decltype使用的是一个不加括号的变量，则得到的结果就是该变量的类型;
+如果给变量加上了一层或多层括号，编译器就会把它当成是一个表达式。变量是一种可以作为赋值语句左值的特殊表达式
+所以这样的decltype就会得到引用类型；
+//decltype 的表达式如果是加上了括号的变量，结果将是引用
+decltype((i))d; //错误：d 是 int &，必须初始化
+decltype(i)e; //正确 ： e 是一个（未初始化的）int
+NOTE decltype((variable))(注意是双层括号)的结果永远是引用，
+而 decltype（variable)的结果只有当 variable 本身就是一个引用时才是引用
 
+2.6 自定义数据类型
+2.6.1 定义 Sales_data 类型
+定义
+struct Sales_data {
+	std::string bookNo;
+	unsigned units_sold = 0;
+	double revenue = 0.0;
+};
+我们的类以关键字 struct 开始，紧跟着类名和类体（其中类体部分可以为空）
+类内部定义为名字必须唯一，但是可以与类外部定义的名字重复
+类体右侧的表示结束的花括号后必须写一个分号，
+因为类体后面可以紧跟变量名以示对该类型对象的定义，分号必不可少
+struct Sales_data {
+	/*
+	*
+	*/
+}accum,trans,*salesptr;
+//与下面的等价
+struct Sales_data {
+	/*
+	*
+	*/
+};
+Sales_data accum, trans, *salesptr;
+//后续会学到 class 定义的数据结构
+
+2.6.2 使用 Sales_data 类
+和 Sales_item 类不同的是,自定义的 Sales_data 类没有提供任何操作
+添加两个 Sales_data 对象
+因为 Sales_data 类没有提供任何操作，所以我们必须自己编码实现输入，输出和相加的功能
+添加两个Sales_data对象
+假设已知Sales_data类定义于Sales_data.h文件
+#include<iostream>
+#include<string>
+#include"Sales_data.h"
+int main()
+{
+	Sales_data datal, data2;
+	//读入 data1 和 data2 的代码
+	//检查data1 和 data2 的ISBN 是否相同
+	//如果相同，求 data1 和 data2 的总和
+}
+Sales_data 对象读入数据
+string 类型是字符序列，操作有 >> （读入字符串） << （写出字符串） == （比较字符串）等
+double price = 0;
+std::cin >> data1.bookNo >> 
 
