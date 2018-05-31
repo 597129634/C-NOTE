@@ -549,3 +549,53 @@ auto i = 0, *p = &i; //正确：i 是整数，p 是整型指针
 auto sz = 0, pi = 3.14; //错误：sz 和 pi 的类型不一致
 
 复合类型，常量和 auto
+编译器有时推断出来的 auto 类型和初始值不完全一样，编译器会适当改变其类型使符合轨规则
+1 编译器以引用对象的类型作为 auto 的类型
+int i = 0, &r = i;
+auto a = r; //a 是一个整数（r 是 i 的别名，i 是一个整数）
+2 auto 一般会忽略顶层 const 同时保留底层 const
+const int ci = i, &cr = ci;
+auto b = ci; //b 是一个整数（ci 的顶层const特性被忽略）
+auto c = cr; //c 是一个整数（cr是ci的别名，ci 本身是一个顶层 const）
+auto d = &i; //d 是一个整型指针
+auto e = &ci; //e 是一个指向整数常量的指针（对常量对象取地址是一种底层 const）
+如果希望推断出顶层 const，要明确指出
+const auto f = ci; //ci 的推演类型是 int ，f 是 const int
+也可以将引用类型设为 auto 原初始化规则仍适用
+auto &g = ci; //g 是一个整型常量引用，绑定到 ci
+auto &h = 42; //错误，不能为非常量引用绑定字面值
+const auto &j = 42; //正确，可以为常量引用绑定字面值
+设置一个类型为 auto 的引用使，初始值中的顶层常量仍保留
+如果给初始值绑定一个引用，此时的常量并非顶层常量
+
+要在一条语句定义多个变量，&和*只从属于某个声明符
+auto k = ci, &i = i; // k 是整数，i是整型引用
+auto &m = ci, *p = &ci; //m 是对整型常量的引用，p 是指向整型常量的指针
+//错误，i 的类型是 int 而 &ci 的类型是 const int
+auto &n = i, *p2 = &ci; 
+NOTE 如何输出变量的数据类型
+使用 typeid().name(); 如下
+int a = 3;
+cout << "a = " << typeid(a).name() << endl;
+typeid().name() 包含在头文件 typeinfo 中
+#include<typeinfo>
+
+2.5.3 decltype 类型指示符
+如何从表达式的类型推断出要定义的变量类型，但是不想用该表达式的值初始化变量？
+使用 decltype，作用是选择并返回操作是的数据类型
+操作过程中，编译器分析表达式得到其类型，却不实际计算表达式的值
+decltype(f()) sum = x; //sum 的类型就是 函数f 的返回类型
+编译器不实际调用函数 f ，而是使用当调用发生时 f 的返回值类型作为 sum 的类型
+即编译器为 sum 指定的类型就是如果函数 f 被调用时要返回的类型
+
+decltype 处理顶层 const 和引用方式与 auto 有些不同
+如果 decltype 使用的表达式是一个变量，ze decltype 返回该变量类型（包括顶层const和引用在内）
+const int ci = 0, &cj = ci;
+decltype(ci) x = 0; //x 的类型是 const int
+decltype(cj) y = x; //y 的类型是 const int &，y 绑定到变量 x 上
+decltype(cj) z; //错误 ：z 是一个引用，必须初始化
+
+decltype 和引用
+
+
+
