@@ -650,7 +650,6 @@ Sales_data accum, trans, *salesptr;
 
 2.6.2 使用 Sales_data 类
 和 Sales_item 类不同的是,自定义的 Sales_data 类没有提供任何操作
-添加两个 Sales_data 对象
 因为 Sales_data 类没有提供任何操作，所以我们必须自己编码实现输入，输出和相加的功能
 添加两个Sales_data对象
 假设已知Sales_data类定义于Sales_data.h文件
@@ -667,5 +666,6 @@ int main()
 Sales_data 对象读入数据
 string 类型是字符序列，操作有 >> （读入字符串） << （写出字符串） == （比较字符串）等
 double price = 0;
-std::cin >> data1.bookNo >> 
+std::cin >> data1.bookNo >> data1.units_sold >> price;
+
 
