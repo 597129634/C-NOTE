@@ -178,4 +178,178 @@ string s1 = "HELLO", s2 = "world\n";
 string s3 = s1 + s2; //s3 为 "HELLOworld\n"
 s1 += s2; //等价于 s1 = s1 + s2;
 
+
 字面值和 string 对象相加
+标志库允许把字面值和字符串字面值转换成string对象，所以在需要string对象的地方就可以使用这两种字面值替代
+string s1 = "hello", s2 = "world";
+string s3 = s1 + ", " + s2 + '\n';
+当把string对象和字符字面值及字符串字面值混在一条语句中使用时，必须确保每个 + 两侧对象至少有一个string
+string s4 = s1 + ","; //正确:把一个string对象和一个字面值相加
+string s5 = "hello" + ","; //错误：两个运算对象都不是string
+//正确：每个加法运算符都有一个运算对象是string
+string s6 = s1 + "," + "world";
+string s7 = "hello" + "," + s2; //错误：不能把字面值直接相加
+
+
+3.2.3 处理string对象中的字符
+cctype 头文件中的函数
+isalnum(c) //当 c 是字母或数字时为真
+isalpha(c) //当 c 是字母时为真
+iscntrl(c) //当 c 是控制字符时为真
+isdigit(c) //当 c 是数字时为真
+isgraph(c) //当 c 不是空格但可以打印时为真
+islower(c) //当 c 是小写字母时为真
+isprint(c) //当 c 是可打印字符时为真（即 c 是空格或 c 具有可视形式）
+ispunct(c) //当 c 是标点符号时为真（即 c 不是控制字符，数字，字母，可打印空白中的一种）
+isspace(c) //当 c 是空白时为真（即 c 是空格，横向制表符，纵向制表符，回车符，换行符，进纸符的一种）
+isupper(c) //当 c 是大写字母时为真
+isxdigit(c) //当 c 是十六进制数字时为真
+tolower(c) //如果 c 是大写字母，输出对应的小写字母，否则原样输出 c 
+toupper(c) //如果 c 是小写字母，输出对应大写字母，否则原样输出 c 
+如何处理每个字符？
+----使用基于范围的 for 语句
+语法形式如下
+for (declaration : expression)
+statement
+其中 expression 部分是一个对象，用于表示一个序列
+declaration 部分负责定义一个变量，该变量将被用于访问序列中的基础元素
+每次迭代，declaration 部分的变量会被初始化为 expression 部分的下一个元素值
+例如使用for语句把string对象中的每一个字符每行输出一个出来
+string str("some string");
+//每行输出 str 中的一个字符
+for(auto c : str) //对于str中的每个字符
+    cout << c << endl; //输出当前字符，后面紧跟一个换行符
+for循环把变量c和 str 联系起来，其中定义循环控制变量的方式与定义任意一个普通变量是一样的
+上例中通过使用 auto 关键字，让编译器来决定变量 c 的类型，这里 c 的类型是 char
+例：使用范围for语句和ispunct来统计string对象中标点符号的个数
+string s("Hello,world!!!");
+//punct_cnt 的类型和 s.size() 的返回类型一样
+decltype(s.size()) punct_cnt = 0;
+for (auto c : s)
+if (ispunct(c))
+    ++punct_cnt;
+cout << punct_cnt << " punctuation characters in " << s << endl;
+//输出 3 punctuation characters in Hello world!!!
+
+使用范围for语句改变字符串中的字符
+如果想要改变string对象中字符的值，必须把循环变量定义成引用类型
+例：假设把字符串改成大写字母的形式（使用标准库函数 toupper ）
+toupper 函数接受一个字符，然后输出对应的大写形式
+string s("Hello world!!!");
+//转换成大写形式
+for (auto &c : s) //对于 s 中的每个字符（主意 c 是引用）
+    c = toupper(c); //c 是一个引用，赋值语句将改变 s 中的值
+cout << s << endl;
+//输出 HELLO WORLD!!!
+
+只处理一部分字符？
+要想访问string对象中的单个字符有两种方式
+一 使用下标
+二 使用迭代器
+下标运算符([]) 接收的输入参数是 string::size_type 类型的值，该参数表示要访问的字符的位置；返回值是该位置上字符的引用
+string 对象的下标从 0 计起。如果string对象 s 至少包含两个字符，则 s[0]是第一个字符, s[1]是第二个字符....s[s.size - 1]是最后一个
+NOTE string 对象的下标必须大于等于 0 小于 s.size(), 超过此范围会引发不可预知的结果
+NOTE 不能用下标访问空 string
+//使用下标运算符输出 string 对象中的第一个字符
+if (!s.empty())
+    cout << s[0] << endl;
+在访问 string 对象之前，先检查其是否为空
+只要字符串不是常量，就能为下标运算符返回的字符赋新值
+//将字符串的首字符改成大写形式
+string s("some string");
+if (!s.empty()) //确保 s[0] 有字符
+    s[0] = toupper(s[0]);
+//输出 Some string
+
+使用下标进行迭代
+//把s的第一个词改成大写形式
+for (decltype(s.size()) index = 0; index != s.size() && !isspace(s[index]); ++index)
+    s[index] = toupper(a[index]);
+//输出 SOME string
+//上面循环使用index作为 s 的下标，index 类型由 decltype 决定
+//&& 逻辑运算符 且
+
+使用下标执行随机访问
+例 把 0 - 15 之间的十进制数字转换成对应的十六进制数
+//只需初始化一个字符串令其存放十六个十六进制"数字"
+const string hexdigits = "0123456789ABCDEF"; //可能的十六进制数字
+cout << "Enter a series of numbers between 0 and 15"
+     << " separated by space.Hit ENTER when finished: " << endl;
+string result;
+string::size_type n;
+while (cin >> n)
+    if (n < hexgigits.size())
+	    result += hexdigits[n];
+cout << "Your hex number is : " << result << endl;
+//输入 12 0 5 15 8 15
+//输出 Your hex number is ： C05F8F
+
+NOTE 关于3.2.3节练习3.10使用到了 erase 函数--删除字符
+//erase 的原型
+//string erase(int start, int len); 
+//start为要删除字符的起始位置（从0数起），len为要删除字符的个数。
+
+
+3.3 标准库类型 vector
+vector 表示对象的集合，其中所有对象的类型都相同
+vector可以作为不定长数组来使用
+vector可以容纳其他对象，故又常被称为 "容器"
+C++语言有类模板，vector就是一个类模板
+模板本身并非是类或函数，可以将其看出是编译器生成类或函数的一份说明
+(有关模板的使用在acm文件夹下的NOTE2 中有简单提到如何使用)
+以vector为例，提供的额外信息是vector内所存放对象的类型
+vector<int> ivec; //ivec 保存 int 类型的对象
+vector<Sales_item> Sales_vec; //Sales_vec 保存 Sales_item 类型的对象
+NOTE vector 是模板，由vector生成的类型必须包含vector中元素的类型，由尖括号括起来
+NOTE vector声明后，相当于一个不定长数组
+NOTE vector 不能包含引用--因为引用不是对象
+
+3.3.1定义和初始化 vector 对象
+初始化 vector 对象的方法
+vector<T> v1; //v1 是一个空 vector，潜在元素为 T 类型，执行默认初始化
+vector<T> v2(v1); //用 v1 初始化 v2 ，注意两个vector对象的元素必须相同
+vector<T> v2 = v1; //同上
+vector<T> v3(n, val); //用 n 个 val 初始化 v3
+vector<T> v4(n); //v4 包含n个重复执行了值初始化的对象
+vector<T> v5{ a,b,c... }; //包含了初始值个数的元素，每个元素被赋予相应的初始值
+vector<T> v5 = { a,b,c... }; //同上
+
+列表初始化 vector 对象
+vector<string>articles = { "a","an","xxx" };
+//使用花括号来初始化
+上面 articles 包含三个 string 对象
+//注意，使用这种提供初始元素值得列表，只能使用花括号
+vector<string>articles = ("a", "an", "xxx"); //error
+
+创建指定数量的元素
+vector<int>ivec(10, -1);//10 个 int 类型的元素，每个都被初始化为 -1
+
+值初始化
+一般，可以只提供vector对象容纳的元素数量而不用略去初始值，此时库会创建一个值初始化的元素初值
+并赋给容器中的所有元素，这个值由vector对象中的元素类型决定
+eg：
+vector<int>ivec(10);//10 个元素，每个值都是 0
+vector<string>svec(10);//10个元素，每个都是空串
+NOTE 只提供元素数量，不设定初始值，只能用直接初始化，如下error
+vector<int>vec = 10; //error
+
+如何确定初始化时的数是列表初始值还是元素数量？
+vector<int>v1(10); //10个元素，每个都是 0
+vector<int>v2{ 10 }; //一个元素，值为 10
+vector<int>v3(10, 1); //10个元素，每个都是 1
+vector<int>v4{ 10,1 }; //两个元素，值为 10，1
+NOTE 关键是看是花括号还是圆括号
+NOTE 如果使用花括号，但是提供的值又不是列表初始化，需要借助特殊类型的vector对象，eg
+vector<string>v5("h1"); //error,不能使用字符串字面值构建vector对象
+vector<string>v6{ "hi" }; //列表初始化
+vector<string>v7{ 10 }; //v7 有 10 个默认初始化元素，
+vector<string>v8{ 10,"hi" }; //v8 有 10 和元素，值均为 hi
+
+3.3.2 向 vector 对象中添加元素
+较好的方法是创建一个空 vector ，然后向里面添加对象
+该操作使用到了 vector 的成员函数 push_back
+push_back 负责把一个值当成 vector 对象的尾元素（即把一个值存到vector对象的尾端）
+
+
+
+
