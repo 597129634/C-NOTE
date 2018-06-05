@@ -295,6 +295,7 @@ vector 表示对象的集合，其中所有对象的类型都相同
 vector可以作为不定长数组来使用
 vector可以容纳其他对象，故又常被称为 "容器"
 C++语言有类模板，vector就是一个类模板
+使用 vector 包含头文件 #include<vector>
 模板本身并非是类或函数，可以将其看出是编译器生成类或函数的一份说明
 (有关模板的使用在acm文件夹下的NOTE2 中有简单提到如何使用)
 以vector为例，提供的额外信息是vector内所存放对象的类型
@@ -348,8 +349,68 @@ vector<string>v8{ 10,"hi" }; //v8 有 10 和元素，值均为 hi
 3.3.2 向 vector 对象中添加元素
 较好的方法是创建一个空 vector ，然后向里面添加对象
 该操作使用到了 vector 的成员函数 push_back
-push_back 负责把一个值当成 vector 对象的尾元素（即把一个值存到vector对象的尾端）
+push_back 负责把一个值当成 vector 对象的尾元素（即把一个值存到vector对象的尾端） 如下
+vector<int> v2;//空 vector 对象
+for (int i = 0; i != 100; ++i)
+    v2.push_back(i); //依次把整数值放到 v2 尾端
+//循环结束后 v2 有 100 个元素，值从 0--99
+例2 直到运行时才能知道 vector 对象中元素的确切个数
+//从标准输入中读取单词，将其作为 vector 对象的元素储存
+string word;
+vector<string>text; //空 vector 对象
+while (cin >> word)
+{
+	text.push_back(word); //把 word 添加到 text后面
+}
+NOTE 如果循环体内部包含有向vector对象添加元素的语句，则不能使用范围for循环
+//范围for循环语句体内不应该改变其所遍历的大小
+输出 vector 对象可以借助下标和迭代器
 
+3.3.3 其他 vector 操作
+v.empty()  //如果 v 中不含任何元素，返回真，否则返回假
+v.size()   //返回 v 中元素的个数
+v.push_back(t) //向 v 的尾端添加一个值为 t 的元素
+v[n]  //返回 v 中 第 n 个位置上元素的引用
+v1 = v2 //v2 替换 v1 中元素
+v1 = { a,b,c... } //用列表中的元素拷贝替换 v1 中的元素
+v1 == v2  //v1 v2 相等当且仅当他们元素数量相同且对应位置元素值都相同
+v1 != v2
+<, <= , >, >=  //按字典顺序比较大小
+访问 vector 对象中的元素类似于访问 string 对象中的字符
+通过元素在 vector 对象中的位置来访问，如下
+//使用 范围for 处理 vector 对象中的所有元素
+vector<int> v{ 1,2,3,4,5,6,7,8,9 };
+for (auto &i : v)  //对 v 中的每个元素（注意 i 是一个引用）
+	i *= i;  
 
+for (auto i : v)   
+    cout << i << ", ";
 
+cout << endl;
+NOTE 对于 v.size() 返回值是一个 size_type 类型的值
+NOTE 要使用 size_type 首先需要指定它是由哪种类型定义的，如下
+vector<int>::size_type; //right
+vector::size_type; //error
 
+计算vector内对象的索引
+此处的操作类似数组
+//以 10 分为一个分数段统计成绩的数量 0-9, ..... ,100
+vector<unsigned>scores(10, 0); //将 11 个分数段全部置 0
+unsigned grade;
+while (cin >> grade)
+{
+	if (grade <= 100)  //只处理有效成绩
+		++scores[grade / 10]; //等价于 auto ind = grade/10;  +  scores[ind] = scores[ind] + 1;
+}
+
+不能用下标形式添加元素
+vector<int>ivec; //空 vector 对象
+for (decltype(ivec.size())ix = 0; ix != 10; ++ix)
+    ivec[ix] = ix;  //严重错误，ivec 不包含任何元素
+正确的方法是使用 push_back()
+for (decltype(ivec.size())ix = 0; ix != 10; ++ix)
+    ivec.push_back(ix);
+//vector 对象（及string）的下标运算符只能用于访问已经存在的元素，不能用于添加元素
+//确保合法下标的一种有效手段----使用范围for语句
+
+3.4 迭代器简介
