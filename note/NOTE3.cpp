@@ -463,4 +463,49 @@ for (auto it = s.begin(); it != s.end() && !isspace(*it); ++it)
 迭代器类型
 一般不用确切知道迭代器类型
 实际上，拥有迭代器的标准库类型使用 iterator 和 const_iterator 来表示迭代器类型
+vector<int>::iterator it; //it 能读写vector<int>的元素
+string::iterator it2;  //it2 能读写string对象中的字符
+vector<int>::const_iterator it3; //it3只能读元素，不能写元素
+string::const_iterator it4; //it4只能读字符，不能写字符
+const_iterator 和常量指针差不多，只能读，不能写
+iterator 可读可写
+如果 vector 对象或 string 对象是一个常量，只能使用 const_iterator
+如果 vector 对象或 string 对象不是常量，两者都能使用
+NOTE 对迭代器的理解
+迭代器可能指迭代器本身，也可能是指容器定义的迭代器类型，还可能指某个迭代器对象
+
+begin 和 end 运算符
+begin 和 end 返回的具体类型由对象是否是常量决定
+如果对象是常量，begin 和 end 返回 const_iterator, 否则返回 iterator
+vector<int> v;
+const vector<int> cv;
+auto it1 = v.begin(); //it1 的类型是 vector<int>::iterator
+auto it2 = cv.begin(); //it2 的类型是 vector<int>::const_iterator
+为了便于专门得到 const_iterator 类型的返回值，C++11 引入了两个新函数：cbegin 和 cend
+（一般对象只需读不需写最好使用常量类型, 如 const_iterator)
+auto it3 = v.cbegin(); //it3 的类型是 vector<int>::const_iterator
+类似于begin 和 end ，上面两个新函数也返回容器的第一个元素或尾元素
+不同的是无论是 vector 对象还是 string 对象本身是否是常量，返回的都是 const_iterator
+
+结合解引用和成员访问操作
+解引用迭代器可获得迭代器所指的对象，如果该对象的类型恰好是类，就可能进一步访问它的成员
+如：由字符串组成的 vector 对象，要想检查是否为空，令 it 是该 vector 对象的迭代器，
+只需检查 it 所指字符串是否为空就可，如下
+(*it).empty();
+注意(*it).empty 中的圆括号必不可少
+NOTE it->mem 和(*it).mem 的意思一样
+如：用一个 text 的字符串向量存放文本文件中的数据，其中的元素是一句话或一个用于表示段落分隔得空字符串。
+如果要输出text中第一段的内容，可以利用迭代器写一个循环遍历text，知道遇到空字符串的元素为止，如下
+//依次输出text的每一行直到遇到第一个空白行为止
+for (auto it = text.cbegin(); it != text.cend() && !it->empty(); ++it)
+    cout << *it << endl;
+auto it = text.cbegin() //令 it 指向 text 的第一个元素
+it != text.cend() //未到末尾之前，循环
+NOTE 只需读，使用的是 cbegin 和 cend
+
+某些 vector 对象的操作会使迭代器失效
+1 不能在范围for循环中向 vector 对象添加元素
+2 任何一种可能改变 vector 对象容量的操作，比如push_back，都会使vector对象的迭代器失效
+
+
 
